@@ -3,6 +3,10 @@ import threading
 import RTCEventMaster
 
 
+def d():    # дебаговый принт
+    print("OK!")
+
+
 class EventError(Exception):  # Ошибка события
     pass
 
@@ -76,7 +80,7 @@ class Glass(threading.Thread):
         self.port.close()
 
     def _readMessage(self):
-        buf = ''    # временный буффер
+        buf = b''    # временный буффер
         temp = self.port.read()     # читаем побайтово
         while temp != b'<':     # читаем пока не найдем вхождение
             temp = self.port.read()
@@ -94,9 +98,8 @@ class Glass(threading.Thread):
             if listbuf[0] == b'ypr':
                 newData = [float(i) for i in listbuf[1:]]
                 if self.startFlag:  # если была нажата кнопка старт
-                    self.primatyData = self.newData[:]     # устанавливаем начальные данные
+                    self.primatyData = newData[:]     # устанавливаем начальные данные
                     self.startFlag = False
-
                 if self.state is State.Reading:     # если уже производится чтение углов
                     # TODO: убрать хрень с привязкой к data
                     self.data = [newData[0] - self.primatyData[0], newData[1] - self.primatyData[1],
@@ -120,8 +123,8 @@ class Glass(threading.Thread):
             self.eventDict.get("ERROR").push()
 
     def run(self):
-        self.port.write(b'g')   # отправляем любой символ - готовы читать
         while self.state is not State.Exit:
+            self.port.write(b'g')  # отправляем любой символ - готовы читать
             message = self._readMessage()
             if message is not None:
                 self._parseMessage(message)
