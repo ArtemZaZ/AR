@@ -9,11 +9,18 @@ class EventBlock:
         self.name = name  # имя события
         self.event = threading.Event()  # событие
         self.foo = fun  # функция события
+        self.__f = None     # дополнительная переменная ф-ия
+        self.args = None
 
     def setfun(self, f):  # установить функцию события
-        self.foo = f
+        self.__f = f
 
-    def push(self):  # вызвать событие
+    def push(self, *args):  # вызвать событие
+        self.args = args
+
+        def f():    # еще одна переменная(ф-ия с пустыми аргументами)
+            self.__f(*args)
+        self.foo = f
         self.event.set()
 
 
@@ -44,3 +51,7 @@ class EventMaster(threading.Thread):
 
     def append(self, event):  # добавления нового элемента EventBlock в список возможных событий
         self.eventList.append(event)
+
+
+
+

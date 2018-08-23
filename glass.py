@@ -3,7 +3,7 @@ import threading
 import RTCEventMaster
 
 
-def d():    # дебаговый принт
+def d():  # дебаговый принт
     print("OK!")
 
 
@@ -11,12 +11,12 @@ class EventError(Exception):  # Ошибка события
     pass
 
 
-class __GlassState:   # структура состояние очков
+class __GlassState:  # структура состояние очков
     # псевдо-приватные переменные
-    __stopped = 0   # очки остановлены
-    __reading = 1   # производится чтение углов
-    __exit = 2      # был выход из программы
-    __error = 3     # произошла ошибка
+    __stopped = 0  # очки остановлены
+    __reading = 1  # производится чтение углов
+    __exit = 2  # был выход из программы
+    __error = 3  # произошла ошибка
 
     # их геттеры
     @property
@@ -43,10 +43,8 @@ class Glass(threading.Thread):
     def __init__(self, portName):
         threading.Thread.__init__(self)
         self.port = serial.Serial(portName, baudrate=115200)
-        # TODO: убрать привязку к data
-        self.data = [0, 0, 0]   # данные
-        self.primatyData = [0, 0, 0]    # начальные углы
-        self.state = State.Stopped    # ставвим начальное положение - остановлен
+        self.primatyData = [0, 0, 0]  # начальные углы
+        self.state = State.Stopped  # ставвим начальное положение - остановлен
         self.startFlag = False  # метка нажатия кнопки старт
         self.eventDict = {  # Словарь событий
             "START": RTCEventMaster.EventBlock("START"),  # событие начала работы
@@ -55,34 +53,33 @@ class Glass(threading.Thread):
             "READ": RTCEventMaster.EventBlock("READ"),  # события чтения углов
             "ERROR": RTCEventMaster.EventBlock("ERROR")  # событие ошибки чтения углов
         }
-        self.eventMaster = RTCEventMaster.EventMaster()     # создаем мастера событий
-        self.eventMaster.append(self.eventDict.get("START"))    # привязываем обработчики
+        self.eventMaster = RTCEventMaster.EventMaster()  # создаем мастера событий
+        self.eventMaster.append(self.eventDict.get("START"))  # привязываем обработчики
         self.eventMaster.append(self.eventDict.get("STOP"))
         self.eventMaster.append(self.eventDict.get("EXIT"))
         self.eventMaster.append(self.eventDict.get("READ"))
         self.eventMaster.append(self.eventDict.get("ERROR"))
         self.eventMaster.start()
 
-    def connectFunction(self, toEvent, foo):     # ф-ия подключения обработчика события по имени события
+    def connectFunction(self, toEvent, foo):  # ф-ия подключения обработчика события по имени события
         event = self.eventDict.get(toEvent)
-        if not event:
+        if not event:  # если в словаре событий нет такого события - ошибка
             raise EventError(toEvent + ": There is no such event")
-
-        def voidFoo():  # Все обработчики событий имеют в качестве параметра 1 аргумент
-            foo(self.data)
-
-        event.setfun(voidFoo)
+        event.setfun(foo)
 
     def exit(self):
         self.state = State.Exit
-        self.eventDict.get("EXIT").push()
+        self.eventDict.get("EXIT").push()  # вызов события выхода
         self.eventMaster.exit()
         self.port.close()
 
+    def getState(self):
+        return self.state
+
     def _readMessage(self):
-        buf = b''    # временный буффер
-        temp = self.port.read()     # читаем побайтово
-        while temp != b'<':     # читаем пока не найдем вхождение
+        buf = b''  # временный буффер
+        temp = self.port.read()  # читаем побайтово
+        while temp != b'<':  # читаем пока не найдем вхождение
             temp = self.port.read()
         temp = self.port.read()
         while temp != b'>':
@@ -94,17 +91,15 @@ class Glass(threading.Thread):
 
     def _parseMessage(self, message):
         try:
-            listbuf = list(map(bytes, message.split()))     # разделение сообщения на токены и запись их в список
+            listbuf = list(map(bytes, message.split()))  # разделение сообщения на токены и запись их в список
             if listbuf[0] == b'ypr':
                 newData = [float(i) for i in listbuf[1:]]
                 if self.startFlag:  # если была нажата кнопка старт
-                    self.primatyData = newData[:]     # устанавливаем начальные данные
+                    self.primatyData = newData[:]  # устанавливаем начальные данные
                     self.startFlag = False
-                if self.state is State.Reading:     # если уже производится чтение углов
-                    # TODO: убрать хрень с привязкой к data
-                    self.data = [newData[0] - self.primatyData[0], newData[1] - self.primatyData[1],
-                                 newData[2] - self.primatyData[2]]
-                    self.eventDict.get("READ").push()
+                if self.state is State.Reading:  # если уже производится чтение углов
+                    self.eventDict.get("READ").push(newData[0] - self.primatyData[0], newData[1] - self.primatyData[1],
+                                                    newData[2] - self.primatyData[2])
 
             elif listbuf[0] == b'*':  # если сообщение начинается с *
                 print("COMMENT: " + str(message))  # вывод комментария
@@ -114,12 +109,11 @@ class Glass(threading.Thread):
                 self.startFlag = True
                 self.state = State.Reading
 
-            elif listbuf[0] == b'stop':   # если пришло сообщение stop(была нажата кнопка stop)
-                self.primatyData = [0, 0, 0]    # сбросить текущие углы
-                self.eventDict.get("STOP").push()   # вызвать событие нажатия кнопки стоп
+            elif listbuf[0] == b'stop':  # если пришло сообщение stop(была нажата кнопка stop)
+                self.primatyData = [0, 0, 0]  # сбросить текущие углы
+                self.eventDict.get("STOP").push()  # вызвать событие нажатия кнопки стоп
                 self.state = State.Stopped
         except:
-            # TODO: Переделать EventMaster с вызовом аргументов через push(*args)
             self.eventDict.get("ERROR").push()
 
     def run(self):
@@ -131,14 +125,17 @@ class Glass(threading.Thread):
 
 
 if __name__ == "__main__":
-    def startHandler(data):
+    def startHandler():
         print("I started!")
 
-    def stopHandler(data):
+
+    def stopHandler():
         print("I stopped!")
 
-    def readHandler(data):
-        print(data)
+
+    def readHandler(yaw, pitch, roll):
+        print(yaw, pitch, roll)
+
 
     glass = Glass("/dev/ttyUSB0")
     glass.connectFunction("START", startHandler)
