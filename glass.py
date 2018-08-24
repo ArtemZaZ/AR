@@ -3,10 +3,6 @@ import threading
 import RTCEventMaster
 
 
-def d():  # дебаговый принт
-    print("OK!")
-
-
 class EventError(Exception):  # Ошибка события
     pass
 
@@ -17,6 +13,9 @@ class __GlassState:  # структура состояние очков
     __reading = 1  # производится чтение углов
     __exit = 2  # был выход из программы
     __error = 3  # произошла ошибка
+
+    def __setattr__(self, key, value):
+        raise AttributeError("This class can not assign any attributes")    # нельзя присваивать никаких аттрибутов
 
     # их геттеры
     @property
