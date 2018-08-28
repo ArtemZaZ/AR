@@ -2,6 +2,12 @@ import serial
 import threading
 import RTCEventMaster
 
+"""Список того, что можно импортировоть из модуля через from"""
+__all__ = [
+    "State",
+    "Glass"
+]
+
 
 class EventError(Exception):  # Ошибка события
     pass
