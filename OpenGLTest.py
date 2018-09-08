@@ -1,6 +1,6 @@
 import sys
+import glfw
 import OpenGL.GL as gl
-import OpenGL.GLUT as glut
 import numpy as np
 import ctypes
 from OpenGL.GL import shaders
@@ -28,13 +28,16 @@ def keyboard(key, x, y):
         sys.exit()
 
 
-glut.glutInit()
-glut.glutInitDisplayMode(glut.GLUT_DOUBLE | glut.GLUT_RGBA)
-glut.glutCreateWindow('OpenGL Test')
-glut.glutReshapeWindow(512, 512)
-glut.glutReshapeFunc(reshape)
-glut.glutDisplayFunc(display)
-glut.glutKeyboardFunc(keyboard)
+if not glfw.init():
+    sys.exit()
+
+window = glfw.create_window(800, 600, "My OpenGL window", None, None)
+
+if not window:
+    glfw.terminate()
+    sys.exit()
+
+glfw.make_context_current(window)
 
 program = shaders.compileProgram(
     shaders.compileShader(loadShaderSourceFromFile("vertexShader.shader"), gl.GL_VERTEX_SHADER),
@@ -59,4 +62,10 @@ data[...] = (-1, +1), (+1, +1), (-0, -1), (+1, -0.5)
 # Upload CPU data to GPU buffer
 gl.glBufferData(gl.GL_ARRAY_BUFFER, data.nbytes, data, gl.GL_DYNAMIC_DRAW)
 
-glut.glutMainLoop()
+while not glfw.window_should_close(window):
+    glfw.poll_events()
+    gl.glClear(gl.GL_COLOR_BUFFER_BIT)
+    gl.glDrawArrays(gl.GL_TRIANGLE_STRIP, 0, 4)
+    glfw.swap_buffers(window)
+
+glfw.terminate()

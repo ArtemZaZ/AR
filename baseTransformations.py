@@ -41,6 +41,15 @@ def getRotationMatrix(axis=None, angle=0):    # Возвращает матри�
         raise ValueError("parameter axis must be 'x', 'y', 'z' only")
 
 
+def getPerspectiveMatrix(fovy, f, n, aspect):
+    return np.array([[1/(math.tan(fovy/2) * aspect), 0, 0, 0],
+                     [0, 1/math.tan(fovy/2), 0, 0],
+                     [0, 0, (f + n)/(f - n), -2 * f * n/(f - n)],
+                     [0, 0, -1, 0]
+
+    ])
+
+
 if __name__ == "__main__":
     A = getTranslationMatrix(3, 5, 7)
     B = getTranslationMatrix(9, 3, 6)
