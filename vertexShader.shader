@@ -1,6 +1,10 @@
-attribute vec2 position;
+uniform vec4 color;
+uniform mat4 model;
+uniform mat4 view;
+uniform mat4 perspective;
+attribute vec3 position;
 
-void main()
+void main(void)
 {
-    gl_Position = vec4(position, 0.0, 1.0);
+    gl_Position = perspective * view * model * vec4(position, 1.0);
 }

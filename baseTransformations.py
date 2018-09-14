@@ -42,9 +42,9 @@ def getRotationMatrix(axis=None, angle=0):    # Возвращает матри�
 
 
 def getPerspectiveMatrix(fovy, f, n, aspect):
-    return np.array([[1/(math.tan(fovy/2) * aspect), 0, 0, 0],
-                     [0, 1/math.tan(fovy/2), 0, 0],
-                     [0, 0, (f + n)/(f - n), -2 * f * n/(f - n)],
+    return np.array([[1/(tan(fovy/2) * aspect), 0, 0, 0],
+                     [0, 1/tan(fovy/2), 0, 0],
+                     [0, 0, -(f + n)/(f - n), -2 * f * n/(f - n)],
                      [0, 0, -1, 0]
 
     ])
@@ -55,10 +55,7 @@ if __name__ == "__main__":
     B = getTranslationMatrix(9, 3, 6)
     C = getScalingMatrix(1, 2, 3)
     D = getRotationMatrix('z', 45)
-    vec = getHomogeneousVector(1, 2, 3, 1)
+    vec = getHomogeneousVector(-3, 3, 5, 1)
     vec2 = getHomogeneousVector(1, 0, 2, 1)
-    print(A @ vec)
-    print(A @ B)
-    print(C @ vec)
-    print(D @ vec2)
+    P = getPerspectiveMatrix(90, 100, 1, 1)
 
