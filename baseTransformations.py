@@ -49,6 +49,12 @@ def getPerspectiveMatrix(fovy, f, n, aspect):
 
     ])
 
+def getOrthographicMatrix(far, near, top, bottom, left, right):
+    return np.array([[2/(right - left), 0, 0, -((right + left)/(right - left))],
+                     [0, 2/(top - bottom), 0, -((top + bottom)/(top - bottom))],
+                     [0, 0, -2/(far - near), -((far + near)/(far - near))],
+                     [0, 0, -1, 0]])
+
 
 if __name__ == "__main__":
     A = getTranslationMatrix(3, 5, 7)

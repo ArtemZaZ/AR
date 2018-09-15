@@ -41,7 +41,8 @@ class EventMaster(threading.Thread):
                     element.event.clear()  # снять метку события
 
                 if len(self.eventQueue) > 0:  # если очередь не пуста
-                    self.threads.append(threading.Thread(target=self.eventQueue.pop(0).foo))  # добавить в список
+                    self.threads.append(threading.Thread(target=self.eventQueue.pop(0).foo, daemon=True))  # добавить
+                    #  в список
                     #  потоков функцию, принадлежащую первому элементу очереди, при этом удаляя его из очереди
                     self.threads.pop(0).start()  # запустить первый элемент списка потоков, при этом удаляя его
             time.sleep(self.timeSleep)
@@ -52,6 +53,9 @@ class EventMaster(threading.Thread):
     def append(self, event):  # добавления нового элемента EventBlock в список возможных событий
         self.eventList.append(event)
 
+    def appendAll(self, events):
+        for event in events:
+            self.eventList.append(event)
 
 
 

@@ -1,16 +1,13 @@
 import serial
 import threading
 import RTCEventMaster
+import Exceptions
 
 """Список того, что можно импортировоть из модуля через from"""
 __all__ = [
     "State",
     "Glass"
 ]
-
-
-class EventError(Exception):  # Ошибка события
-    pass
 
 
 class __GlassState:  # структура состояние очков
@@ -66,10 +63,10 @@ class Glass(threading.Thread):
         self.eventMaster.append(self.eventDict.get("ERROR"))
         self.eventMaster.start()
 
-    def connectFunction(self, toEvent, foo):  # ф-ия подключения обработчика события по имени события
+    def connect(self, toEvent, foo):  # ф-ия подключения обработчика события по имени события
         event = self.eventDict.get(toEvent)
         if not event:  # если в словаре событий нет такого события - ошибка
-            raise EventError(toEvent + ": There is no such event")
+            raise Exceptions.EventError(toEvent + ": There is no such event")
         event.setfun(foo)
 
     def exit(self):
@@ -143,7 +140,7 @@ if __name__ == "__main__":
 
 
     glass = Glass("/dev/ttyUSB0")
-    glass.connectFunction("START", startHandler)
-    glass.connectFunction("STOP", stopHandler)
-    glass.connectFunction("READ", readHandler)
+    glass.connect("START", startHandler)
+    glass.connect("STOP", stopHandler)
+    glass.connect("READ", readHandler)
     glass.start()
