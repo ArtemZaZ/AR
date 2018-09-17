@@ -53,10 +53,10 @@ class ViewBox:
             raise Exceptions.EventError(toEvent + ": There is no such event")
         event.setfun(foo)
 
-    def draw(self):     # ф-ия для перегрузки
+    def render(self):     # ф-ия для перегрузки
         pass
 
     def swap(self):     # рисуем содержимое
         if self.__visible:
             gl.glViewport(self.x, self.y, self.width, self.height)
-            self.draw()
+            self.render()

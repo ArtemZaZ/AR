@@ -6,6 +6,7 @@ import ctypes
 from OpenGL.GL import shaders
 import baseTransformations as bt
 import time
+import Texture
 
 
 # http://www.labri.fr/perso/nrougier/python-opengl/
@@ -36,27 +37,40 @@ program = shaders.compileProgram(
 
 gl.glUseProgram(program)
 
+Texture.loadTexture("images/testImage.png")
+
 # data = np.zeros((4, 3), dtype=np.float32)
-data = np.zeros(6, [("position", np.float32, 3),
-                    ("color", np.float32, 4)])
+data = np.zeros(6, [("position", np.float64, 3),
+                    ("color", np.float64, 4),
+                    ("texture_coord", np.float64, 2)])
 data['position'] = [[0, 0, 1], [1, 0, -1], [-1, 0, -1], [0, 1, 0],
                     [0, 0, 1], [1, 0, -1]]
 data['color'] = (0, 1, 0, 1), (1, 1, 0, 1), (1, 0, 0, 1), (0, 0, 1, 1),\
                 (0.5, 1, 0, 1), (1, 0.5, 0, 1)
+
+data['texture_coord'] = [[0, 0], [0, 1], [1, 1], [0, 0], [0, 1], [1, 1]]
 buffer = gl.glGenBuffers(1)
 stride = data.strides[0]
-
+print(stride)
 offset = ctypes.c_void_p(0)
 loc = gl.glGetAttribLocation(program, "position")
 gl.glEnableVertexAttribArray(loc)
 gl.glBindBuffer(gl.GL_ARRAY_BUFFER, buffer)
-gl.glVertexAttribPointer(loc, 3, gl.GL_FLOAT, False, stride, offset)
+gl.glVertexAttribPointer(loc, 3, gl.GL_DOUBLE, False, stride, offset)
 
+"""
 offset = ctypes.c_void_p(data.dtype["position"].itemsize)
 loc = gl.glGetAttribLocation(program, "color")
 gl.glEnableVertexAttribArray(loc)
 gl.glBindBuffer(gl.GL_ARRAY_BUFFER, buffer)
-gl.glVertexAttribPointer(loc, 4, gl.GL_FLOAT, False, stride, offset)
+gl.glVertexAttribPointer(loc, 4, gl.GL_DOUBLE, False, stride, offset)
+"""
+
+offset = ctypes.c_void_p(data.dtype["position"].itemsize + data.dtype["color"].itemsize)
+loc = gl.glGetAttribLocation(program, "textCoord")
+gl.glEnableVertexAttribArray(loc)
+gl.glBindBuffer(gl.GL_ARRAY_BUFFER, buffer)
+gl.glVertexAttribPointer(loc, 2, gl.GL_DOUBLE, False, stride, offset)
 
 
 perspective = gl.glGetUniformLocation(program, "perspective")

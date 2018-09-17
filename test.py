@@ -7,6 +7,9 @@ print(glass.State.__stopped)
 print(glass.State.Stopped)
 """
 
+import PIL
+
+
 import ViewBox
 
 vb = ViewBox.ViewBox()
