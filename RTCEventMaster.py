@@ -16,6 +16,8 @@ class EventBlock:
         self.__f = f
 
     def push(self, *args):  # вызвать событие
+        if self.__f is None:
+            return
         self.args = args
 
         def f():    # еще одна переменная(ф-ия с пустыми аргументами)

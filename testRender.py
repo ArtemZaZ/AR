@@ -13,7 +13,6 @@ from baseMath import Rectangle
 from TextureRegion import TextureRegion
 import ViewMaster
 
-
 if not glfw.init():
     sys.exit()
 
@@ -30,9 +29,10 @@ glfw.make_context_current(window)
 
 
 texture = Texture.loadTexture("images/testImage.png")
+spriteTexture = Texture.loadTexture("images/testSpriteImage.png")
 
-customSpriteFirst = Sprite.Sprite(Rectangle(0, 0, 0.5, 0.5), TextureRegion(texture, 0.5, 0, 0.5, 0.5))
-customSpriteSecond = Sprite.Sprite(Rectangle(0.5, 0.5, 0.5, 0.5), TextureRegion(texture, 0, 0, 1, 0.5))
+customSpriteFirst = Sprite.Sprite(Rectangle(-1, 1, 2, 2), TextureRegion(texture, 0, 0, 1, 1))
+customSpriteSecond = Sprite.Sprite(Rectangle(0, 0, 0.5, 0.5), TextureRegion(spriteTexture, 0, 0, 1/8, 1/2))
 
 
 viewBoxFirst = View2D.View2D(0, 0, WIDTH / 2, HEIGHT)
@@ -54,12 +54,26 @@ VM = ViewMaster.ViewMaster()
 VM.append(viewBoxFirst)
 VM.append(viewBoxSecond)
 
+i = 0
+
 while not glfw.window_should_close(window):
     glfw.poll_events()
     gl.glClear(gl.GL_COLOR_BUFFER_BIT)
     VM.drawAll()
+    customSpriteSecond.rectangle.position = (i, i)
+    if int(i*5000) % 10 == 0:
+        print(int(i*10))
+        customSpriteSecond.textureRegion.x += 1/8
+        if customSpriteSecond.textureRegion.x > 1:
+            customSpriteSecond.textureRegion.x = 0
+    customSpriteSecond.updateAttributes()
     glfw.swap_buffers(window)
-    time.sleep(0.01)
+    time.sleep(0.017)
+    i += 0.0010
+    if i > 500:
+        viewBoxSecond.hide()
+    if i > 1000:
+        viewBoxSecond.show()
 
 glfw.terminate()
 viewBoxFirst.exit()

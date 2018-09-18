@@ -10,8 +10,8 @@ class Sprite:
     def __init__(self, rectangle=None, textureRegion=None,
                  vertexShaderSource=bs.baseSpriteVertexShader,
                  fragmentShaderSource=bs.baseSpriteFragmentShader):
-        self.rectangle = rectangle
-        self.textureRegion = textureRegion
+        self.__rectangle = rectangle
+        self.__textureRegion = textureRegion
         self.__program = shaders.compileProgram(
             shaders.compileShader(vertexShaderSource, gl.GL_VERTEX_SHADER),
             shaders.compileShader(fragmentShaderSource, gl.GL_FRAGMENT_SHADER)
@@ -37,8 +37,8 @@ class Sprite:
         gl.glBindBuffer(gl.GL_ARRAY_BUFFER, self.__vboDataBuffer)
         gl.glVertexAttribPointer(self.__textureCoordinatesLocation, 2, gl.GL_FLOAT, False, stride, offset)
 
-        r = self.rectangle
-        tr = self.textureRegion
+        r = self.__rectangle
+        tr = self.__textureRegion
         self.__data["vertex"][...] = (r.x, r.y), (r.x + r.width, r.y),\
                                      (r.x, r.y - r.height), (r.x + r.width, r.y - r.height)
 
@@ -47,14 +47,45 @@ class Sprite:
         gl.glBufferData(gl.GL_ARRAY_BUFFER, self.__data.nbytes, self.__data, gl.GL_DYNAMIC_DRAW)
         gl.glBindVertexArray(0)
 
+    def updateAttributes(self):
+        gl.glBindVertexArray(self.__vaoDataBuffer)
+        r = self.__rectangle
+        tr = self.__textureRegion
+        self.__data["vertex"][...] = (r.x, r.y), (r.x + r.width, r.y), \
+                                     (r.x, r.y - r.height), (r.x + r.width, r.y - r.height)
+
+        self.__data["textureCoordinates"][...] = (tr.x, tr.y), (tr.x + tr.width, tr.y), \
+                                                 (tr.x, tr.y - tr.height), (tr.x + tr.width, tr.y - tr.height)
+        gl.glBufferData(gl.GL_ARRAY_BUFFER, self.__data.nbytes, self.__data, gl.GL_DYNAMIC_DRAW)
+        gl.glBindVertexArray(0)
+
+    @property
+    def rectangle(self):
+        """
+        Через свойство можно изменить параметры объекта, т.к. возвращается ссылка на него
+        :return:
+        """
+        return self.__rectangle
+
+    @rectangle.setter
+    def rectangle(self, rectangle):
+        self.__rectangle = rectangle
+
+    @property
+    def textureRegion(self):
+        return self.__textureRegion
+
+    @textureRegion.setter
+    def textureRegion(self, textureRegion):
+        self.__textureRegion = textureRegion
+
     def draw(self):
         gl.glUseProgram(self.__program)
-        gl.glBindTexture(gl.GL_TEXTURE_2D, self.textureRegion.texture)
+        gl.glBindTexture(gl.GL_TEXTURE_2D, self.__textureRegion.texture)
         gl.glBindVertexArray(self.__vaoDataBuffer)
         gl.glDrawArrays(gl.GL_TRIANGLE_STRIP, 0, self.__data.shape[0])
         gl.glBindVertexArray(0)
         gl.glBindTexture(gl.GL_TEXTURE_2D, 0)
-
         gl.glUseProgram(0)
 
 

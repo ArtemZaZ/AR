@@ -8,6 +8,15 @@ class Rectangle:
         self.width = width
         self.height = height
 
+    @property
+    def position(self):
+        return self.x, self.y
+
+    @position.setter
+    def position(self, value):
+        self.x = value[0]
+        self.y = value[1]
+
 
 def normalize(vec):     # приведение массива к нормали
     norm = np.linalg.norm(vec)
