@@ -2,8 +2,8 @@ import ViewBox as vb
 
 
 class ViewMaster(list):
-    def __init__(self, *args):
-        list.__init__(self, *args)
+    def __init__(self):
+        list.__init__(self)
         self.sort()   # сортируем окна по глубине
 
     def drawAll(self):

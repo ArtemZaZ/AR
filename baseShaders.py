@@ -1,12 +1,12 @@
 baseSpriteVertexShader = """
 attribute vec2 vertex;
-attribute vec2 textCoordinates;
+attribute vec2 textureCoordinates;
 varying vec2 vTextCoordinates;
 
 void main(void)
 {
-    vTextCoordinates = textCoordinates;
-    gl_Position = vec4(position, 0.0, 1.0);
+    vTextCoordinates = textureCoordinates;
+    gl_Position = vec4(vertex, 0.0, 1.0);
 }
 """
 

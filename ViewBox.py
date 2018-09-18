@@ -5,10 +5,10 @@ import Exceptions
 
 class ViewBox:
     def __init__(self, x=0, y=0, width=100, height=100, z=0):
-        self.x = x  # координаты viewport
-        self.y = y
-        self.width = width
-        self.height = height
+        self.x = int(x)  # координаты viewport
+        self.y = int(y)
+        self.width = int(width)
+        self.height = int(height)
         self.z = z  # z - координата окна
         self.__visible = True     # отображается ли окно
         self.eventDict = {
@@ -23,7 +23,7 @@ class ViewBox:
         self.eventMaster.start()
 
     def __del__(self):
-        self.eventMaster.exit()
+        self.exit()
 
     def show(self):     # показать окно
         self.__visible = True
@@ -59,4 +59,7 @@ class ViewBox:
     def swap(self):     # рисуем содержимое
         if self.__visible:
             gl.glViewport(self.x, self.y, self.width, self.height)
-            self.render()
+            self.render(self)
+
+    def exit(self):
+        self.eventMaster.exit()

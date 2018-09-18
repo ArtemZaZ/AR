@@ -3,5 +3,5 @@ class TextureRegion:
         self.texture = texture
         self.x = x
         self.y = y
-        self.widtr = width
+        self.width = width
         self.height = heigth
