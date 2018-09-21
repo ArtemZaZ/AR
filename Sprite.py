@@ -16,8 +16,9 @@ class Sprite:
             shaders.compileShader(vertexShaderSource, gl.GL_VERTEX_SHADER),
             shaders.compileShader(fragmentShaderSource, gl.GL_FRAGMENT_SHADER)
         )
-        self.__data = np.zeros(4, [("vertex", np.float32, 2),
-                                   ("textureCoordinates", np.float32, 2)])
+        # мб через формы сделать
+        self.__data = np.zeros(4, [("vertex", np.float64, 2),
+                                   ("textureCoordinates", np.float64, 2)])
 
         self.__vboDataBuffer = gl.glGenBuffers(1)
         self.__vaoDataBuffer = gl.glGenVertexArrays(1)
@@ -29,13 +30,13 @@ class Sprite:
         self.__vertexLocation = gl.glGetAttribLocation(self.__program, "vertex")
         gl.glEnableVertexAttribArray(self.__vertexLocation)
         gl.glBindBuffer(gl.GL_ARRAY_BUFFER, self.__vboDataBuffer)
-        gl.glVertexAttribPointer(self.__vertexLocation, 2, gl.GL_FLOAT, False, stride, offset)
+        gl.glVertexAttribPointer(self.__vertexLocation, 2, gl.GL_DOUBLE, False, stride, offset)
 
         offset = ctypes.c_void_p(self.__data.dtype["vertex"].itemsize)
         self.__textureCoordinatesLocation = gl.glGetAttribLocation(self.__program, "textureCoordinates")
         gl.glEnableVertexAttribArray(self.__textureCoordinatesLocation)
         gl.glBindBuffer(gl.GL_ARRAY_BUFFER, self.__vboDataBuffer)
-        gl.glVertexAttribPointer(self.__textureCoordinatesLocation, 2, gl.GL_FLOAT, False, stride, offset)
+        gl.glVertexAttribPointer(self.__textureCoordinatesLocation, 2, gl.GL_DOUBLE, False, stride, offset)
 
         r = self.__rectangle
         tr = self.__textureRegion
@@ -44,7 +45,7 @@ class Sprite:
 
         self.__data["textureCoordinates"][...] = (tr.x, tr.y), (tr.x + tr.width, tr.y), \
                                                  (tr.x, tr.y - tr.height), (tr.x + tr.width, tr.y - tr.height)
-        gl.glBufferData(gl.GL_ARRAY_BUFFER, self.__data.nbytes, self.__data, gl.GL_DYNAMIC_DRAW)
+        gl.glBufferData(gl.GL_ARRAY_BUFFER, self.__data.nbytes, self.__data, gl.GL_STREAM_DRAW)
         gl.glBindVertexArray(0)
 
     def updateAttributes(self):
@@ -80,12 +81,11 @@ class Sprite:
         self.__textureRegion = textureRegion
 
     def draw(self):
-        gl.glUseProgram(self.__program)
-        gl.glBindTexture(gl.GL_TEXTURE_2D, self.__textureRegion.texture)
-        gl.glBindVertexArray(self.__vaoDataBuffer)
-        gl.glDrawArrays(gl.GL_TRIANGLE_STRIP, 0, self.__data.shape[0])
-        gl.glBindVertexArray(0)
-        gl.glBindTexture(gl.GL_TEXTURE_2D, 0)
-        gl.glUseProgram(0)
+        with self.__program as e:
+            gl.glBindTexture(gl.GL_TEXTURE_2D, self.__textureRegion.texture)
+            gl.glBindVertexArray(self.__vaoDataBuffer)
+            gl.glDrawArrays(gl.GL_TRIANGLE_STRIP, 0, self.__data.shape[0])
+            gl.glBindVertexArray(0)
+            gl.glBindTexture(gl.GL_TEXTURE_2D, 0)
 
 

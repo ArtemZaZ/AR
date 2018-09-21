@@ -1,25 +1,29 @@
-import glass
-
-"""
-print(glass.State.Stopped)
-glass.State.__stopped = 1
-print(glass.State.__stopped)
-print(glass.State.Stopped)
-"""
-
-import PIL
+import glfw
+import sys
+import OpenGL.GL as gl
+import time
+import trimesh
 
 
-import ViewBox
+if not glfw.init():
+    sys.exit()
 
-vb = ViewBox.ViewBox()
+WIDTH = 800
+HEIGHT = 600
+window = glfw.create_window(WIDTH, HEIGHT, "OpenGL window", None, None)
+
+if not window:
+    glfw.terminate()
+    sys.exit()
+
+glfw.make_context_current(window)
 
 
-class Window(ViewBox.ViewBox):
-    def __init__(self):
-        ViewBox.ViewBox.__init__(self, 0, 0, 0, 0)
+while not glfw.window_should_close(window):
+    glfw.poll_events()
+    gl.glClear(gl.GL_COLOR_BUFFER_BIT)
 
-    def draw(self):
-        print(1)
+    glfw.swap_buffers(window)
+    time.sleep(0.017)
 
-Window().draw()
+glfw.terminate()
