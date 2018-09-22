@@ -5,35 +5,37 @@ import sys
 from OpenGL.GL import shaders
 import glEngine.TestClass as Test
 import numpy as np
-from glEngine.buffers import VertexBuffer
-
+from glEngine.buffers import VertexBuffer, IndexBuffer
+from glEngine.arrays import VertexArray
 
 test = Test.Test()
 
 
 def init(self):
     gl.glUseProgram(self.program)
-    self.vertexBuffer = np.zeros(3, [("position", np.float64, 3), ("color", np.float64, 4)]).view(VertexBuffer)
+    self.vao = VertexArray()
+    self.vertexBuffer = np.zeros(8, [("position", np.float32, 3),
+                                     ("color", np.float32, 4)]).view(VertexBuffer)
+
+    self.vertexBuffer["position"] = [[1, 1, 1], [-1, 1, 1], [-1, -1, 1], [1, -1, 1],
+                                     [1, -1, -1], [1, 1, -1], [-1, 1, -1], [-1, -1, -1]]
+    self.vertexBuffer["color"] = [[0, 1, 1, 1], [0, 0, 1, 1], [0, 0, 0, 1], [0, 1, 0, 1],
+                                  [1, 1, 0, 1], [1, 1, 1, 1], [1, 0, 1, 1], [1, 0, 0, 1]]
     self.vertexBuffer.__init__(self.program)
-    self.vertexBuffer.create()
-    self.vertexBuffer["position"][...] = (-1, -1, 0), (0, 1, 0), (0, 0, 0)
-    self.vertexBuffer["color"][...] = (0, 1, 0, 1), (1, 0, 0, 1), (0, 0, 1, 1)
-    self.vertexBuffer.update()
+    self.indexBuffer = np.array([0, 1, 1, 2, 2, 3, 3, 0,
+                                 4, 7, 7, 6, 6, 5, 5, 4,
+                                 0, 5, 1, 6, 2, 7, 3, 4], dtype=np.uint32).view(IndexBuffer)
+    self.indexBuffer.__init__()
+    self.vao.vbo = self.vertexBuffer
+    self.vao.ibo = self.indexBuffer
+    self.vao.create()
+    gl.glEnable(gl.GL_DEPTH_TEST)
 
 
 def run(self):
-    self.vertexBuffer.bind()
-    gl.glDrawArrays(gl.GL_TRIANGLE_STRIP, 0, self.vertexBuffer.shape[0])
-    self.vertexBuffer.unbind()
-
+    self.vao.draw(mode=gl.GL_TRIANGLE_STRIP)
 
 test.initFunc = init
 test.runFunc = run
 
 test.run()
-
-
-
-
-
-

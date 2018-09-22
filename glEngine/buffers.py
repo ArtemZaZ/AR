@@ -40,11 +40,11 @@ class GPUBuffer(GLObject, np.ndarray):
         else:
             raise TypeError("None buffer type")
 
-    def bind(self):
+    def _bind(self):
         if self._descriptor and (self._type in _buffersTypes):
             gl.glBindBuffer(self._type, self._descriptor)
 
-    def unbind(self):
+    def _unbind(self):
         gl.glBindBuffer(self._type, 0)
 
 
@@ -66,18 +66,35 @@ class VertexBuffer(GPUBuffer):
                 offset = ctypes.c_void_p(offsetD)
                 location = gl.glGetAttribLocation(self._program, key)
                 gl.glEnableVertexAttribArray(location)
-                gl.glBindBuffer(self._type, self._descriptor)
+                self.bind()
                 gl.glVertexAttribPointer(location, self[key].shape[1], _variable_N_to_G[self[key].dtype], False,
                                          self.strides[0], offset)
                 offsetD += self.dtype[key].itemsize
             gl.glBufferData(self._type, self.nbytes, self, gl.GL_DYNAMIC_DRAW)
-            gl.glBindBuffer(self._type, 0)
+            self.unbind()
 
     def _update(self):
         self.bind()
         gl.glBufferData(self._type, self.nbytes, self, gl.GL_DYNAMIC_DRAW)
         self.unbind()
 
+
+# TODO: проверить
+class IndexBuffer(GPUBuffer):
+    def __new__(cls, *args, **kwargs):
+        return GPUBuffer.__new__(cls, *args, type=gl.GL_ELEMENT_ARRAY_BUFFER, **kwargs)
+
+    def __init__(self, *args, **kwargs):
+        GPUBuffer.__init__(self, *args, type=gl.GL_ELEMENT_ARRAY_BUFFER, **kwargs)
+
+    def _create(self):
+        GPUBuffer._create(self)
+        self._update()
+
+    def _update(self):
+        self.bind()
+        gl.glBufferData(gl.GL_ELEMENT_ARRAY_BUFFER, self.nbytes, self, gl.GL_DYNAMIC_DRAW)
+        self.unbind()
 
 
 if __name__ == "__main__":

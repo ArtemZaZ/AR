@@ -33,3 +33,15 @@ class GLObject(object):
     def descriptor(self):
         return self._descriptor
 
+    def _bind(self):
+        pass
+
+    def bind(self):
+        self._bind()
+
+    def unbind(self):
+        self._unbind()
+
+    def _unbind(self):
+        pass
+
