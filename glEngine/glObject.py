@@ -29,3 +29,7 @@ class GLObject(object):
     def type(self):
         return self._type
 
+    @property
+    def descriptor(self):
+        return self._descriptor
+

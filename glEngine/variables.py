@@ -62,7 +62,7 @@ class Attribute(Variable):
 
     @property
     def numpyInfoTurple(self):
-        return self._name, _variableTypesInfo.get(type), self._data.shape[1]
+        return self._name, _variableTypesInfo.get(self._type), self._data.shape[1]
 
 
 class Uniform(Variable):
