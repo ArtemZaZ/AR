@@ -2,22 +2,9 @@ from glEngine.glObject import GLObject
 import OpenGL.GL as gl
 import numpy as np
 import ctypes
+from glEngine.types import *
 
 _buffersTypes = [gl.GL_ELEMENT_ARRAY_BUFFER, gl.GL_ARRAY_BUFFER]
-
-_variable_G_to_N = {
-    gl.GL_FLOAT: np.float32,
-    gl.GL_DOUBLE: np.float64,
-    gl.GL_INT: np.int32,
-    gl.GL_UNSIGNED_INT: np.uint32
-}
-
-_variable_N_to_G = {
-    np.dtype(np.float32): gl.GL_FLOAT,
-    np.dtype(np.float64): gl.GL_DOUBLE,
-    np.dtype(np.int32): gl.GL_INT,
-    np.dtype(np.uint32): gl.GL_UNSIGNED_INT
-}
 
 
 class GPUBuffer(GLObject, np.ndarray):
@@ -67,7 +54,7 @@ class VertexBuffer(GPUBuffer):
                 location = gl.glGetAttribLocation(self._program, key)
                 gl.glEnableVertexAttribArray(location)
                 self.bind()
-                gl.glVertexAttribPointer(location, self[key].shape[1], _variable_N_to_G[self[key].dtype], False,
+                gl.glVertexAttribPointer(location, self[key].shape[1], variable_N_to_G[self[key].dtype], False,
                                          self.strides[0], offset)
                 offsetD += self.dtype[key].itemsize
             gl.glBufferData(self._type, self.nbytes, self, gl.GL_DYNAMIC_DRAW)

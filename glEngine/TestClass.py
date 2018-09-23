@@ -36,9 +36,12 @@ void main()
 
 
 class Test:
-    def __init__(self):
+    def __init__(self, initFunc, runFunc):
         if not glfw.init():
             sys.exit()
+
+        self.initFunc = initFunc
+        self.runFunc = runFunc
 
         self.window = glfw.create_window(WIDTH, HEIGHT, "OpenGL window", None, None)
 
@@ -47,27 +50,22 @@ class Test:
             sys.exit()
 
         glfw.make_context_current(self.window)
+        self.initFunc(self)
 
-        self.program = shaders.compileProgram(
-            shaders.compileShader(vertexShader, gl.GL_VERTEX_SHADER),
-            shaders.compileShader(fragmentShader, gl.GL_FRAGMENT_SHADER)
-        )
-        gl.glUseProgram(self.program)
-
-        #self.mesh = trimesh.load('tube.obj')
-        self.perspective = gl.glGetUniformLocation(self.program, "perspective")
-        self.view = gl.glGetUniformLocation(self.program, "view")
-        self.model = gl.glGetUniformLocation(self.program, "model")
+        gl.glUseProgram(self.mesh.program)
+        self.perspective = gl.glGetUniformLocation(self.mesh.program, "perspective")
+        self.view = gl.glGetUniformLocation(self.mesh.program, "view")
+        self.model = gl.glGetUniformLocation(self.mesh.program, "model")
         self.eye = np.eye(4)
 
         gl.glUniformMatrix4fv(self.perspective, 1, False, self.eye)
         gl.glUniformMatrix4fv(self.view, 1, False, self.eye)
         gl.glUniformMatrix4fv(self.model, 1, False, self.eye)
 
-        translationMatrix = bt.getTranslationMatrix(0, 0, -4)
+        translationMatrix = bt.getTranslationMatrix(0, 0, -300)
         gl.glUniformMatrix4fv(self.view, 1, False, translationMatrix.transpose())
 
-        perspectiveMatrix = bt.getPerspectiveMatrix(90, 100, 1, WIDTH / HEIGHT)
+        perspectiveMatrix = bt.getPerspectiveMatrix(90, 1000, 1, WIDTH / HEIGHT)
         gl.glUniformMatrix4fv(self.perspective, 1, False, perspectiveMatrix.transpose())
         self.angle = 0.0
         gl.glUseProgram(0)
@@ -76,14 +74,15 @@ class Test:
         pass
 
     def run(self):
-        self.initFunc(self)
         while not glfw.window_should_close(self.window):
             glfw.poll_events()
             gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT)
+            gl.glUseProgram(self.mesh.program)
             matrix = bt.getRotationMatrix('z', self.angle)
             matrix2 = bt.getRotationMatrix('x', self.angle * 2)
             gl.glUniformMatrix4fv(self.model, 1, False, matrix2 @ matrix)
             self.runFunc(self)
+            gl.glUseProgram(0)
             self.angle += 0.4
             glfw.swap_buffers(self.window)
             time.sleep(0.017)

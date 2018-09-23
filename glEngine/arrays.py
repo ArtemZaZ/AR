@@ -2,6 +2,7 @@ import OpenGL.GL as gl
 from glEngine.glObject import GLObject
 from glEngine.buffers import *
 import numpy as np
+from glEngine.types import *
 
 
 class VertexArray(GLObject):
@@ -47,6 +48,6 @@ class VertexArray(GLObject):
         self.bind()
         self._ibo.bind()
         #gl.glDrawArrays(mode, self._descriptor, self._vbo.size)
-        gl.glDrawElements(mode, self._ibo.size, gl.GL_UNSIGNED_INT, None)
+        gl.glDrawElements(mode, self._ibo.size, variable_N_to_G[self._ibo.dtype], None)
         self._ibo.unbind()
         self.unbind()
