@@ -38,7 +38,7 @@ mesh = trimesh.load('models/tube.obj')
 print(type(mesh.vertices))
 print(type(mesh.metadata['vertex_texture']))
 
-data = np.zeros(mesh.vertices.shape[0], [("position", np.float64, 3)])
+data = np.zeros(mesh.vertices.shape[0], [("position", np.dtype(np.float64), 3)])
 faces = np.zeros(mesh.faces.shape, dtype=np.uint32)
 faces[...] = mesh.faces
 print(faces)

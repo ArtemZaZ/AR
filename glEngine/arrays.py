@@ -6,10 +6,13 @@ from glEngine.types import *
 
 
 class VertexArray(GLObject):
+    """
+    openGL VAO
+    """
     def __init__(self):
         GLObject.__init__(self)
-        self._vbo = None
-        self._ibo = None
+        self._vbo = None    # OpenGL VBO
+        self._ibo = None    # OpenGL IBO/EBO
 
     def _create(self):
         self._descriptor = gl.glGenVertexArrays(1)

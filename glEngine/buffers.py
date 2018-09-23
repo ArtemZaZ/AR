@@ -3,11 +3,16 @@ import OpenGL.GL as gl
 import numpy as np
 import ctypes
 from glEngine.types import *
+import warnings
 
+""" Допустимые типы для GPUBuffer"""
 _buffersTypes = [gl.GL_ELEMENT_ARRAY_BUFFER, gl.GL_ARRAY_BUFFER]
 
 
 class GPUBuffer(GLObject, np.ndarray):
+    """
+    Базовый класс буффера видеокарты
+    """
     def __new__(cls, *args, type=None, **kwargs):
         if type not in _buffersTypes:
             raise TypeError("Unknown buffer type")
@@ -36,6 +41,9 @@ class GPUBuffer(GLObject, np.ndarray):
 
 
 class VertexBuffer(GPUBuffer):
+    """
+    Класс OpenGL VBO
+    """
     def __new__(cls, program, *args, **kwargs):
         #cls._attribPropertyDict = {}
         cls._program = program
@@ -46,18 +54,18 @@ class VertexBuffer(GPUBuffer):
         GPUBuffer.__init__(self, *args, type=gl.GL_ARRAY_BUFFER, **kwargs)
 
     def _create(self):
-        GPUBuffer._create(self)
-        if self.dtype.fields:
+        GPUBuffer._create(self)     # создаем буффер
+        if self.dtype.fields:   # если есть аттрибуты
             offsetD = 0
-            for key in self.dtype.fields.keys():
-                offset = ctypes.c_void_p(offsetD)
-                location = gl.glGetAttribLocation(self._program, key)
-                gl.glEnableVertexAttribArray(location)
+            for key in self.dtype.fields.keys():    # проходимся по каждому аттрибуту
+                offset = ctypes.c_void_p(offsetD)   # смещение данных в буффере
+                location = gl.glGetAttribLocation(self._program, key)   # ищем необходимый нам аттрибут
+                gl.glEnableVertexAttribArray(location)  # включаем его
                 self.bind()
                 gl.glVertexAttribPointer(location, self[key].shape[1], variable_N_to_G[self[key].dtype], False,
-                                         self.strides[0], offset)
-                offsetD += self.dtype[key].itemsize
-            gl.glBufferData(self._type, self.nbytes, self, gl.GL_DYNAMIC_DRAW)
+                                         self.strides[0], offset)   # указываем, как будут идти данные
+                offsetD += self.dtype[key].itemsize     # добавляем смещение
+            gl.glBufferData(self._type, self.nbytes, self, gl.GL_DYNAMIC_DRAW)      # загружаем данные в видеопамять
             self.unbind()
 
     def _update(self):
@@ -66,8 +74,10 @@ class VertexBuffer(GPUBuffer):
         self.unbind()
 
 
-# TODO: проверить
 class IndexBuffer(GPUBuffer):
+    """
+    OpenGL IBO/EBO
+    """
     def __new__(cls, *args, **kwargs):
         return GPUBuffer.__new__(cls, *args, type=gl.GL_ELEMENT_ARRAY_BUFFER, **kwargs)
 

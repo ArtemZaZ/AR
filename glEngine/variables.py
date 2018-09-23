@@ -1,33 +1,12 @@
 from glEngine.glObject import GLObject
 import OpenGL.GL as gl
 import numpy as np
-
-# TODO: в процессе дополнить
-_variableTypes = [gl.GL_FLOAT, gl.GL_DOUBLE, gl.GL_BYTE,
-                  gl.GL_UNSIGNED_BYTE, gl.GL_SHORT,
-                  gl.GL_UNSIGNED_SHORT, gl.GL_UNSIGNED_INT,
-                  gl.GL_UNSIGNED_INT64, gl.GL_CHAR,
-                  gl.GL_INT, gl.GL_BOOL,
-                  gl.GL_HALF_NV, gl.GL_VOID_P,
-                  gl.GL_FLOAT_VEC2, gl.GL_FLOAT_VEC3,
-                  gl.GL_FLOAT_VEC4,
-                  gl.GL_FLOAT_MAT2, gl.GL_FLOAT_MAT3,
-                  gl.GL_FLOAT_MAT4,
-                  gl.GL_SAMPLER_1D, gl.GL_SAMPLER_2D,
-                  gl.GL_SAMPLER_CUBE]
-
-# TODO: в процессе дополнить
-_variableTypesInfo = {
-    gl.GL_FLOAT: np.float32,
-    gl.GL_DOUBLE: np.float64,
-    gl.GL_INT: np.int32,
-    gl.GL_UNSIGNED_INT: np.uint32
-}
+from glEngine.types import *
 
 
 class Variable(GLObject):
     def __init__(self, name, program, type, data):
-        if type not in _variableTypes:
+        if type not in variableTypes:
             raise TypeError("Unknown variable type")
         GLObject.__init__(self)
         self._program = program
@@ -35,6 +14,10 @@ class Variable(GLObject):
         self._type = type
         self._data = data
         self._location = None
+        """ Вспомогательные переменные, для обновления данных формы """
+        self._isMat = None
+        self._updateFunction = None
+        self._count = None
 
     @property
     def name(self):
@@ -48,27 +31,32 @@ class Variable(GLObject):
     def data(self):
         return self._data
 
-
-class Attribute(Variable):
-    def __init__(self, *args, **kwargs):
-        Variable.__init__(self, *args, **kwargs)
-
-    def _create(self):
-        self._location = gl.glGetAttribLocation(self._program, self._name)
-
-    def setVertexAttribPointer(self, stride, offset):
-        gl.glEnableVertexAttribArray(self._location)
-        gl.glVertexAttribPointer(self._location, self._data.shape[1], self._type, False, stride, offset)
-
-    @property
-    def numpyInfoTurple(self):
-        return self._name, _variableTypesInfo.get(self._type), self._data.shape[1]
+    @data.setter
+    def data(self, value):
+        self._data = value
 
 
 class Uniform(Variable):
     def __init__(self, *args, **kwargs):
         Variable.__init__(self, *args, **kwargs)
 
+    def _create(self):
+        gl.glUseProgram(self._program)
+        self._location = gl.glGetUniformLocation(self._program, self._name)
+        self._updateFunction, self._count, self._isMat = uniformTypesToFunctions[self._type]
+        if self._isMat:
+            self._updateFunction(self._location, self._count, False, self._data)
+        else:
+            self._updateFunction(self._location, self._count, self._data)
+        gl.glUseProgram(0)
+
+    def _update(self):
+        # TODO: Переделать под одну статичную ф-ию
+        if self._isMat:
+            self._updateFunction(self._location, self._count, False, self._data)
+        else:
+            self._updateFunction(self._location, self._count, self._data)
+
 
 if __name__ == "__main__":
-    a = Attribute(name="position", program=1, type=gl.GL_DOUBLE, data=None)
+    pass
