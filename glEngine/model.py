@@ -65,6 +65,23 @@ class Mesh:
         self._vao.create()
         gl.glUseProgram(0)
 
+    def update(self):
+        """ Записываем данные в вершинный буффер """
+        self._vertexBuffer[self._verticesName][...] = self._vertices
+        for key in self._programAttributeList:
+            self._vertexBuffer[key][...] = self.__getattribute__(key)
+
+        """ индексный буффер """
+        if (self.faces.dtype is np.dtype(np.uint64)) or (self.faces.dtype is np.dtype(np.int64)):
+            warnings.warn("integer 64bit dtype not supported, dtype is translated to uint32")
+            self._indexBuffer = np.zeros(self.faces.shape, dtype=np.uint32).view(IndexBuffer)
+        else:
+            self._indexBuffer = np.zeros(self.faces.shape, dtype=self.faces.dtype).view(IndexBuffer)
+
+        self._indexBuffer[...] = self.faces
+
+        self._vao.update()
+
     @property
     def program(self):
         return self._program

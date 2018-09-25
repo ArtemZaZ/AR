@@ -47,6 +47,11 @@ class VertexArray(GLObject):
     def _unbind(self):
         gl.glBindVertexArray(0)
 
+    def _update(self):
+        self._vbo.update()
+        self._ibo.update()
+        print(1)
+
     def draw(self, mode=gl.GL_TRIANGLE_STRIP):
         self.bind()
         self._ibo.bind()

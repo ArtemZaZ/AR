@@ -45,7 +45,7 @@ class Uniform(Variable):
         self._location = gl.glGetUniformLocation(self._program, self._name)
         self._updateFunction, self._count, self._isMat = uniformTypesToFunctions[self._type]
         if self._isMat:
-            self._updateFunction(self._location, self._count, False, self._data)
+            self._updateFunction(self._location, self._count, True, self._data)
         else:
             self._updateFunction(self._location, self._count, self._data)
         gl.glUseProgram(0)
@@ -53,7 +53,7 @@ class Uniform(Variable):
     def _update(self):
         # TODO: Переделать под одну статичную ф-ию
         if self._isMat:
-            self._updateFunction(self._location, self._count, False, self._data)
+            self._updateFunction(self._location, self._count, True, self._data)
         else:
             self._updateFunction(self._location, self._count, self._data)
 

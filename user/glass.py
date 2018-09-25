@@ -1,7 +1,6 @@
 import serial
 import threading
-import RTCEventMaster
-import Exceptions
+from glEngine import RTCEventMaster, exceptions
 
 """Список того, что можно импортировоть из модуля через from"""
 __all__ = [
@@ -66,7 +65,7 @@ class Glass(threading.Thread):
     def connect(self, toEvent, foo):  # ф-ия подключения обработчика события по имени события
         event = self.eventDict.get(toEvent)
         if not event:  # если в словаре событий нет такого события - ошибка
-            raise Exceptions.EventError(toEvent + ": There is no such event")
+            raise exceptions.EventError(toEvent + ": There is no such event")
         event.setfun(foo)
 
     def exit(self):

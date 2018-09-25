@@ -1,11 +1,8 @@
 import OpenGL.GL as gl
-import glEngine.TestClass as Test
 import numpy as np
-from glEngine.buffers import VertexBuffer, IndexBuffer
-from glEngine.arrays import VertexArray
 import trimesh
 from glEngine.model import Mesh
-import baseTransformations as bt
+from glEngine.base import baseTransformations as bt
 from glEngine.variables import Uniform
 import sys
 import glfw
@@ -50,9 +47,9 @@ model = Mesh(vertexShader=vertexShader, fragmentShader=fragmentShader, vertices=
              faces=mesh.faces)
 model.create()
 
-perspectiveU = Uniform("perspective", model.program, gl.GL_FLOAT_MAT4, bt.getPerspectiveMatrix(90, 1000, 1, WIDTH / HEIGHT).transpose())
+perspectiveU = Uniform("perspective", model.program, gl.GL_FLOAT_MAT4, bt.getPerspectiveMatrix(90, 1000, 1, WIDTH / HEIGHT))
 modelU = Uniform("model", model.program, gl.GL_FLOAT_MAT4, np.eye(4))
-viewU = Uniform("view", model.program, gl.GL_FLOAT_MAT4, bt.getTranslationMatrix(0, 0, -300).transpose())
+viewU = Uniform("view", model.program, gl.GL_FLOAT_MAT4, bt.getTranslationMatrix(0, 0, -300))
 
 perspectiveU.create()
 modelU.create()
@@ -64,9 +61,7 @@ while not glfw.window_should_close(window):
     glfw.poll_events()
     gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT)
     gl.glUseProgram(model.program)
-    matrix = bt.getRotationMatrix('z', angle)
-    matrix2 = bt.getRotationMatrix('x', angle * 2)
-    modelU.data = matrix2 @ matrix
+    modelU.data = bt.getRotationMatrix('z', angle) @ bt.getRotationMatrix('x', angle * 2)
     modelU.update()
     model.draw(mode=gl.GL_TRIANGLES)
     angle += 0.4

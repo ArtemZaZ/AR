@@ -1,4 +1,4 @@
-import ViewBox as vb
+from glEngine import viewBox as vb
 
 
 class ViewMaster(list):

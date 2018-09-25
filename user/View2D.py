@@ -1,6 +1,4 @@
-import OpenGL.GL as gl
-import ViewBox as vb
-import baseTransformations as bt
+from glEngine import viewBox as vb
 
 
 class View2D(vb.ViewBox):

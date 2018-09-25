@@ -5,7 +5,7 @@ from OpenGL.GL import shaders
 import numpy as np
 import sys
 import glfw
-import baseTransformations as bt
+from glEngine.base import baseTransformations as bt
 import time
 
 if not glfw.init():

@@ -1,17 +1,11 @@
 import sys
 import glfw
 import OpenGL.GL as gl
-import numpy as np
-import ctypes
-from OpenGL.GL import shaders
-import baseTransformations as bt
 import time
-import Texture
-import View2D
-import Sprite
-from baseMath import Rectangle
-from TextureRegion import TextureRegion
-import ViewMaster
+from user import View2D
+from glEngine import sprite, viewMaster, texture
+from glEngine.base.baseMath import Rectangle
+from glEngine.textureRegion import TextureRegion
 
 if not glfw.init():
     sys.exit()
@@ -28,12 +22,13 @@ if not window:
 glfw.make_context_current(window)
 
 
-texture = Texture.loadTexture("images/testImage.png")
-spriteTexture = Texture.loadTexture("images/testSpriteImage.png")
+texture = texture.loadTexture("images/testImage.png")
+spriteTexture = texture.loadTexture("images/testSpriteImage.png")
 
-customSpriteFirst = Sprite.Sprite(Rectangle(-1, 1, 2, 2), TextureRegion(texture, 0, 0, 1, 1))
-customSpriteSecond = Sprite.Sprite(Rectangle(0, 0, 0.5, 0.5), TextureRegion(spriteTexture, 0, 0, 1/8, 1/2))
-
+customSpriteFirst = sprite.Sprite(Rectangle(-1, 1, 2, 2), TextureRegion(texture, 0, 0, 1, 1))
+customSpriteSecond = sprite.Sprite(Rectangle(0, 0, 0.5, 0.5), TextureRegion(spriteTexture, 0, 0, 1 / 8, 1 / 2))
+customSpriteFirst.create()
+customSpriteSecond.create()
 
 viewBoxFirst = View2D.View2D(0, 0, WIDTH / 2, HEIGHT)
 viewBoxSecond = View2D.View2D(WIDTH / 2, 0, WIDTH / 2, HEIGHT)
@@ -50,7 +45,7 @@ def renderSecond(viewBox):
 
 viewBoxFirst.render = renderFirst
 viewBoxSecond.render = renderSecond
-VM = ViewMaster.ViewMaster()
+VM = viewMaster.ViewMaster()
 VM.append(viewBoxFirst)
 VM.append(viewBoxSecond)
 
@@ -62,14 +57,13 @@ while not glfw.window_should_close(window):
     VM.drawAll()
     customSpriteSecond.rectangle.position = (i, i)
     if int(i*5000) % 10 == 0:
-        print(int(i*10))
         customSpriteSecond.textureRegion.x += 1/8
         if customSpriteSecond.textureRegion.x > 1:
             customSpriteSecond.textureRegion.x = 0
-    customSpriteSecond.updateAttributes()
+        customSpriteSecond.update()
     glfw.swap_buffers(window)
     time.sleep(0.017)
-    i += 0.0010
+    i += 0.010
     if i > 500:
         viewBoxSecond.hide()
     if i > 1000:

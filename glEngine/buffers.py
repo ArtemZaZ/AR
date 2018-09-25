@@ -65,7 +65,7 @@ class VertexBuffer(GPUBuffer):
                 gl.glVertexAttribPointer(location, self[key].shape[1], variable_N_to_G[self[key].dtype], False,
                                          self.strides[0], offset)   # указываем, как будут идти данные
                 offsetD += self.dtype[key].itemsize     # добавляем смещение
-            gl.glBufferData(self._type, self.nbytes, self, gl.GL_DYNAMIC_DRAW)      # загружаем данные в видеопамять
+            gl.glBufferData(self._type, self.nbytes, self.data, gl.GL_DYNAMIC_DRAW)      # загружаем данные в видеопамять
             self.unbind()
 
     def _update(self):
@@ -90,7 +90,7 @@ class IndexBuffer(GPUBuffer):
 
     def _update(self):
         self.bind()
-        gl.glBufferData(gl.GL_ELEMENT_ARRAY_BUFFER, self.nbytes, self, gl.GL_DYNAMIC_DRAW)
+        gl.glBufferData(gl.GL_ELEMENT_ARRAY_BUFFER, self.nbytes, self.data, gl.GL_DYNAMIC_DRAW)
         self.unbind()
 
 

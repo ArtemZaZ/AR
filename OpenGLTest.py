@@ -4,10 +4,9 @@ import OpenGL.GL as gl
 import numpy as np
 import ctypes
 from OpenGL.GL import shaders
-import baseTransformations as bt
+from glEngine.base import baseTransformations as bt
 import time
-import Texture
-import gloo
+from glEngine import texture
 import trimesh
 
 
@@ -39,7 +38,7 @@ program = shaders.compileProgram(
 
 gl.glUseProgram(program)
 
-Texture.loadTexture("images/testImage.png")
+texture.loadTexture("images/testImage.png")
 
 mesh = trimesh.load('models/tube.obj')
 
