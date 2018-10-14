@@ -20,8 +20,8 @@ class Sprite:
         self.__data["vertex"][...] = (r.x, r.y), (r.x + r.width, r.y), \
                                      (r.x, r.y - r.height), (r.x + r.width, r.y - r.height)
 
-        self.__data["textureCoordinates"][...] = (tr.x, tr.y), (tr.x + tr.width, tr.y), \
-                                                 (tr.x, tr.y - tr.height), (tr.x + tr.width, tr.y - tr.height)
+        self.__data["textureCoordinates"][...] = (tr.x, -tr.y), (tr.x + tr.width, -tr.y), \
+                                                 (tr.x, -tr.y - tr.height), (tr.x + tr.width, -tr.y - tr.height)
 
     def create(self):
         self._spriteMesh.create()

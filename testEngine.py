@@ -41,15 +41,15 @@ if not window:
 
 glfw.make_context_current(window)
 
-mesh = trimesh.load('models/1002_tray_bottom.STL')
-
+meshF = trimesh.load('models/HP Pavilion Laptop.obj', 'obj')
+mesh = meshF[0]
 model = Mesh(vertexShader=vertexShader, fragmentShader=fragmentShader, vertices=("position", mesh.vertices),
              faces=mesh.faces)
 model.create()
 
-perspectiveU = Uniform("perspective", model.program, gl.GL_FLOAT_MAT4, bt.getPerspectiveMatrix(90, 1000, 1, WIDTH / HEIGHT))
+perspectiveU = Uniform("perspective", model.program, gl.GL_FLOAT_MAT4, bt.getPerspectiveMatrix(90, 2000, 1, WIDTH / HEIGHT))
 modelU = Uniform("model", model.program, gl.GL_FLOAT_MAT4, np.eye(4))
-viewU = Uniform("view", model.program, gl.GL_FLOAT_MAT4, bt.getTranslationMatrix(0, 0, -300))
+viewU = Uniform("view", model.program, gl.GL_FLOAT_MAT4, bt.getTranslationMatrix(0, 0, -5))
 
 perspectiveU.create()
 modelU.create()
