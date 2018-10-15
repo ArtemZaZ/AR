@@ -6,6 +6,10 @@ def getHomogeneousVector(x, y, z, w):   # Возвращает вектор в �
     return np.array([x, y, z, w])
 
 
+def getDecartVector(x, y, z):
+    return np.array([x, y, z])
+
+
 def getTranslationMatrix(tx, ty, tz):   # Возвращает матрицу меремещения в однородных координатах
     return np.array([[1, 0, 0, tx],
                      [0, 1, 0, ty],

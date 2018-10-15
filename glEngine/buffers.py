@@ -60,6 +60,7 @@ class VertexBuffer(GPUBuffer):
             for key in self.dtype.fields.keys():    # проходимся по каждому аттрибуту
                 offset = ctypes.c_void_p(offsetD)   # смещение данных в буффере
                 location = gl.glGetAttribLocation(self._program, key)   # ищем необходимый нам аттрибут
+                print(key, location)
                 gl.glEnableVertexAttribArray(location)  # включаем его
                 self.bind()
                 gl.glVertexAttribPointer(location, self[key].shape[1], variable_N_to_G[self[key].dtype], False,
