@@ -36,7 +36,6 @@ class Battery:
 
     @percent.setter
     def percent(self, value):
-        print(self.__state)
         self._percent = value
         if value > 75:
             self.__setState("100%")

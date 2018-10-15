@@ -4,6 +4,9 @@ import trimesh
 from glEngine.model import Mesh
 from glEngine.base import baseTransformations as bt
 from glEngine.variables import Uniform
+from user.battery import Battery
+from glEngine.viewBox import ViewBox
+from glEngine.viewMaster import ViewMaster
 import sys
 import glfw
 import time
@@ -55,7 +58,7 @@ void main()
     vec3 worldNormal = normalize(vec3(vModel * vec4(vNormal, 0.0)));
     vec3 lightVector = normalize( vLightPos - worldPos );
     float brightness = dot( worldNormal, lightVector );
-    gl_FragColor = vec4(brightness * vColor, 1.0);
+    gl_FragColor = vec4(brightness * vColor + vec3(0.1, 0.1, 0.1), 1.0);
 }
 """
 
@@ -79,25 +82,55 @@ model.create()
 perspectiveU = Uniform("perspective", model.program, gl.GL_FLOAT_MAT4, bt.getPerspectiveMatrix(90, 2000, 1, WIDTH / HEIGHT))
 modelU = Uniform("model", model.program, gl.GL_FLOAT_MAT4, np.eye(4))
 viewU = Uniform("view", model.program, gl.GL_FLOAT_MAT4, bt.getTranslationMatrix(0, 0, -5))
-lightPos = Uniform("lightPos", model.program, gl.GL_FLOAT_VEC3, bt.getDecartVector(0, 0, 20))
-color = Uniform("color", model.program, gl.GL_FLOAT_VEC3, bt.getDecartVector(0.0, 0.7, 0.0))
+lightPos = Uniform("lightPos", model.program, gl.GL_FLOAT_VEC3, bt.getDecartVector(10, 20, 20))
+color = Uniform("color", model.program, gl.GL_FLOAT_VEC3, bt.getDecartVector(1.0, 0.0, 0.0))
 perspectiveU.create()
 modelU.create()
 viewU.create()
 lightPos.create()
 color.create()
 
-gl.glEnable(gl.GL_DEPTH_TEST);
+
+meshViewBox = ViewBox(0, 0, WIDTH, HEIGHT)
+batteryBox = ViewBox(WIDTH - 40, HEIGHT - 40, 40, 40)
+battery = Battery()
+battery.create()
+
+
+def renderMesh(vb):
+    global angle
+    gl.glEnable(gl.GL_DEPTH_TEST)
+    gl.glUseProgram(model.program)
+    modelU.data = bt.getRotationMatrix('z', -2 * angle) @ bt.getRotationMatrix('x', angle)
+    modelU.update()
+    model.draw(mode=gl.GL_TRIANGLES)
+    gl.glUseProgram(0)
+    gl.glDisable(gl.GL_DEPTH_TEST)
+
+
+def renderBattery(vb):
+    battery.draw()
+
+
+meshViewBox.render = renderMesh
+batteryBox.render = renderBattery
+batteryBox.z = 1
+VM = ViewMaster()
+VM.append(batteryBox)
+VM.append(meshViewBox)
+
+
 angle = 0.0
 while not glfw.window_should_close(window):
     glfw.poll_events()
     gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT)
-    gl.glUseProgram(model.program)
-    modelU.data = bt.getRotationMatrix('z', angle) @ bt.getRotationMatrix('x', angle * 2)
-    modelU.update()
-    model.draw(mode=gl.GL_TRIANGLES)
-    angle += 0.4
-    gl.glUseProgram(0)
+    VM.drawAll()
+    angle += 0.5
+    if angle > 180:
+        angle = 0.0
+    battery.percent = angle/2
     glfw.swap_buffers(window)
     time.sleep(0.017)
 glfw.terminate()
+meshViewBox.exit()
+batteryBox.exit()
