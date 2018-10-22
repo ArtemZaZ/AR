@@ -1,6 +1,6 @@
 from vispy.io import read_png
 
-from sprite import Sprite
+from pyarvis.sprite import Sprite
 
 
 class Battery(Sprite):
@@ -15,7 +15,7 @@ class Battery(Sprite):
             "charging": (0, 2/3, 1/3, 1/3)
         }
         self._percent = 100
-        Sprite.__init__(self, read_png("pyarvis/images/battery.png"), **kwargs)
+        Sprite.__init__(self, read_png("images/battery.png"), **kwargs)
         self.rect = self._textureRegionDict['100%']
 
     @property

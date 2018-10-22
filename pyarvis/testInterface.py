@@ -9,8 +9,7 @@ from vispy.util import load_data_file
 from vispy.color import Color
 from vispy.visuals import CubeVisual, transforms
 
-import sprite
-import battery
+from pyarvis import battery
 
 
 class MySceneCanvas(SceneCanvas):
@@ -55,7 +54,6 @@ view.camera = 'panzoom'
 view.camera.flip = (0, 1, 0)
 view.size = canvas.size
 
-img_data = read_png("battery.png")
 interpolation = 'nearest'
 
 imageViewBox = scene.ViewBox(parent=view.scene, name="ivb")
