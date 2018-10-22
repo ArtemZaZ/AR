@@ -83,7 +83,26 @@ color = Color("#3f51b5ff")
 #cube = scene.visuals.Cube(size=1, color=color, edge_color="black",
 #                          parent=cubeViewBox.scene)
 #spr.rect = (0, 0, 0.5, 0.5)
-spr.depth = -1.0
+#spr.depth = -1.0
+
+
+@canvas.events.key_press.connect
+def on_key_press(event):
+    k = event.text
+    if k == '1':
+        spr.percent = 100
+    if k == '2':
+        spr.percent = 75
+    if k == '3':
+        spr.percent = 50
+    if k == '4':
+        spr.percent = 25
+    if k == '5':
+        spr.percent = 15
+    if k == '6':
+        spr.percent = 5
+    if k == '7':
+        spr.percent = -1
 
 
 canvas.show()
