@@ -1,4 +1,5 @@
 from vispy.io import read_png
+from vispy.scene import Text
 
 from pyarvis.sprite import Sprite
 
@@ -15,8 +16,10 @@ class Battery(Sprite):
             "charging": (0, 2/3, 1/3, 1/3)
         }
         self._percent = 100
+        self.text = Text("100%", font_size=5, color='w', bold=True)
         Sprite.__init__(self, read_png("images/battery.png"), **kwargs)
         self.rect = self._textureRegionDict['100%']
+        self.text.parent = self.parent
 
     @property
     def percent(self):
@@ -25,6 +28,12 @@ class Battery(Sprite):
     @percent.setter
     def percent(self, value):
         self._percent = value
+        if value > 5:
+            if self.text.text[:-1] != str(self._percent):
+                self.text.text = str(self._percent) + '%'
+        else:
+            self.text.text = ''
+
         if value > 75:
             self.rect = self._textureRegionDict['100%']
         elif value > 50:

@@ -10,6 +10,7 @@ from vispy.color import Color
 from vispy.visuals import CubeVisual, transforms
 
 from pyarvis import battery
+from pyarvis.thermometer import Thermometer
 
 
 class MySceneCanvas(SceneCanvas):
@@ -69,7 +70,7 @@ cubeViewBox = scene.ViewBox(parent=view.scene, name='cvb', border_width=2e-3,
 cubeViewBox.interactive = True
 
 spr = battery.Battery(parent=imageViewBox.scene)
-
+therm = Thermometer(parent=imageViewBox.scene)
 
 cubeViewBox.pos = 0, 0
 cubeViewBox.size = 1, 1
@@ -87,6 +88,8 @@ color = Color("#3f51b5ff")
 @canvas.events.key_press.connect
 def on_key_press(event):
     k = event.text
+    if k == '0':
+        therm.temperature = 20
     if k == '1':
         spr.percent = 100
     if k == '2':
