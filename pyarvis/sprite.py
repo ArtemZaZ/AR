@@ -120,4 +120,3 @@ class SpriteVisual(Visual):
         if self._depthNeedUpdate:
             self.shared_program['depth'] = self._depth
             self._depthNeedUpdate = False
-

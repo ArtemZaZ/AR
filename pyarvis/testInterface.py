@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import sys
 
-from vispy import gloo, scene
+from vispy import gloo, scene, app
 from vispy.app import Timer
 from vispy.io import read_png
 from vispy.scene import SceneCanvas
@@ -27,7 +27,7 @@ class MySceneCanvas(SceneCanvas):
 
     def on_draw(self, event):
         SceneCanvas.on_draw(self, event)
-        #self.cube.draw()
+        # self.cube.draw()
 
     def on_resize(self, event):
         SceneCanvas.on_resize(self, event)
@@ -69,7 +69,7 @@ cubeViewBox = scene.ViewBox(parent=view.scene, name='cvb', border_width=2e-3,
                             margin=0.02, border_color='green')
 cubeViewBox.interactive = True
 
-spr = battery.Battery(parent=imageViewBox.scene)
+#spr = battery.Battery(parent=imageViewBox.scene)
 therm = Thermometer(parent=imageViewBox.scene)
 
 cubeViewBox.pos = 0, 0
@@ -79,17 +79,17 @@ cubeViewBox.camera.rect = (-1, -1, 2, 2)
 cubeViewBox.camera.interactive = True
 
 color = Color("#3f51b5ff")
-#cube = scene.visuals.Cube(size=1, color=color, edge_color="black",
+
+
+# cube = scene.visuals.Cube(size=1, color=color, edge_color="black",
 #                          parent=cubeViewBox.scene)
-#spr.rect = (0, 0, 0.5, 0.5)
-#spr.depth = -1.0
+# spr.rect = (0, 0, 0.5, 0.5)
+# spr.depth = -1.0
 
 
 @canvas.events.key_press.connect
 def on_key_press(event):
     k = event.text
-    if k == '0':
-        therm.temperature = 20
     if k == '1':
         spr.percent = 100
     if k == '2':
@@ -105,6 +105,17 @@ def on_key_press(event):
     if k == '7':
         spr.percent = -1
 
+
+temp = 0
+
+
+def on_timer(event):
+    global temp
+    therm.temperature = temp
+    temp += 1
+
+
+timer = app.Timer(1.0, connect=on_timer, start=True)
 
 canvas.show()
 if __name__ == '__main__' and sys.flags.interactive == 0:
